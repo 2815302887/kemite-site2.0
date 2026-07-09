@@ -20,7 +20,9 @@ const models = [
 const payload = {};
 for (const model of models) {
   const buffer = fs.readFileSync(path.join(root, model));
-  payload[model] = `data:model/gltf-binary;base64,${buffer.toString("base64")}`;
+  const dataUri = `data:model/gltf-binary;base64,${buffer.toString("base64")}`;
+  payload[model] = dataUri;
+  payload[path.basename(model)] = dataUri;
 }
 
 fs.mkdirSync(path.join(root, "dist"), { recursive: true });

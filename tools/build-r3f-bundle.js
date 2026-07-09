@@ -1,9 +1,13 @@
 import esbuild from "esbuild";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 esbuild.buildSync({
   entryPoints: {
-    app: "./src/r3f-app.jsx",
-    vendor: "./src/r3f-vendor.js",
+    app: path.join(root, "src", "r3f-app.jsx"),
+    vendor: path.join(root, "src", "r3f-vendor.js"),
   },
   bundle: true,
   format: "esm",
@@ -14,8 +18,8 @@ esbuild.buildSync({
   outdir: "dist/r3f",
   entryNames: "[name]",
   chunkNames: "chunks/[name]-[hash]",
-  absWorkingDir: process.cwd(),
-  nodePaths: ["node_modules"],
+  absWorkingDir: root,
+  nodePaths: [path.join(root, "node_modules")],
   define: {
     "process.env.NODE_ENV": '"production"'
   }

@@ -130,8 +130,7 @@ class SceneErrorBoundary extends React.Component {
 }
 
 function getModelUrl(path) {
-  if (window.location.protocol !== "file:") return path;
-  return modelData[path] || path;
+  return modelData[path] || modelData[path.split("/").pop()] || path;
 }
 
 function getFallbackSpecs(product) {
