@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>联系宁波可米特焊接材料有限公司 - 产品选型与工艺支持</title>
+    <meta name="description" content="联系宁波可米特焊接材料有限公司，获取锡膏、贴片红胶产品选型、样品测试和 SMT 工艺支持。" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="联系宁波可米特焊接材料有限公司" />
+    <meta property="og:description" content="提交产品型号、应用场景或工艺问题，获取锡膏和贴片红胶选型建议。" />
+    <meta property="og:image" content="public/images/brand/home-hero.png" />
+    <link rel="stylesheet" href="styles/vars.css" />
+    <link rel="stylesheet" href="styles/common.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <nav class="nav">
+        <a class="brand" href="index.html" aria-label="可米特焊接材料首页">
+          <span class="mark">KMT</span>
+          <span>可米特焊接材料</span>
+        </a>
+        <button id="navToggle" class="nav-toggle" type="button" aria-label="打开导航" aria-expanded="false">☰</button>
+        <div id="navLinks" class="nav-links">
+          <a href="index.html">首页</a>
+          <a href="products.html">产品中心</a>
+          <a href="about.html">关于我们</a>
+          <a class="active" href="contact.html">联系我们</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section>
+        <div class="wrap contact-grid">
+          <div>
+            <p class="eyebrow">联系我们</p>
+            <h1>获取产品选型与工艺支持</h1>
+            <p class="lead">请留下您的需求，我们会根据产品应用、制程条件和可靠性要求，提供适合的锡膏或贴片红胶方案建议。</p>
+
+            <form id="contactForm" class="info-card" style="margin-top: 32px; padding: 24px">
+              <div class="grid featured-grid">
+                <label>
+                  <span class="form-label">姓名</span>
+                  <input class="form-control" name="name" placeholder="请输入姓名" autocomplete="name" maxlength="40" required />
+                </label>
+                <label>
+                  <span class="form-label">电话</span>
+                  <input class="form-control" name="phone" placeholder="请输入联系电话" autocomplete="tel" maxlength="40" />
+                </label>
+              </div>
+              <label style="display: block; margin-top: 18px">
+                <span class="form-label">邮箱</span>
+                <input class="form-control" name="email" type="email" placeholder="name@example.com" autocomplete="email" maxlength="120" required />
+              </label>
+              <label style="display: block; margin-top: 18px">
+                <span class="form-label">留言内容</span>
+                <textarea class="form-control textarea" name="message" placeholder="示例：需 NC-338ROL1 锡膏，用于连接器 SMT 贴片产线，求助解决连锡、少锡或回流焊点不饱满问题。" maxlength="1000" required></textarea>
+              </label>
+              <button id="contactSubmit" class="button primary" type="submit" style="margin-top: 18px">提交留言</button>
+              <p id="contactStatus" class="form-status" hidden></p>
+            </form>
+          </div>
+
+          <aside class="info-card" style="align-self: start">
+            <div class="info-body">
+              <h2>公司信息</h2>
+              <dl class="meta">
+                <div><dt>联系人</dt><dd>陈小平</dd></div>
+                <div><dt>公司名称</dt><dd>宁波可米特焊接材料有限公司</dd></div>
+                <div><dt>电话</dt><dd><a href="tel:15355188458">153 5518 8458</a></dd></div>
+                <div><dt>邮箱</dt><dd><a href="mailto:652612663@qq.com">652612663@qq.com</a></dd></div>
+                <div><dt>地址</dt><dd>余姚市阳明街道畈周村畈周5号</dd></div>
+                <div><dt>主营产品</dt><dd>锡膏、贴片红胶、SMT 工艺支持</dd></div>
+              </dl>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <h2>可米特焊接材料</h2>
+        <p>锡膏、贴片红胶、SMT 工艺支持。</p>
+      </div>
+    </footer>
+
+    <script src="src/utils/formVerify.js"></script>
+    <script src="src/utils/request.js"></script>
+    <script>
+      const navToggle = document.getElementById('navToggle')
+      const navLinks = document.getElementById('navLinks')
+      navToggle.addEventListener('click', () => {
+        const isOpen = navLinks.classList.toggle('is-open')
+        navToggle.setAttribute('aria-expanded', String(isOpen))
+      })
+
+      const contactForm = document.getElementById('contactForm')
+      const contactSubmit = document.getElementById('contactSubmit')
+      const contactStatus = document.getElementById('contactStatus')
+
+      function showContactStatus(type, message) {
+        window.KemiteForm.setStatus(contactStatus, type, message)
+      }
+
+      contactForm.addEventListener('submit', async (event) => {
+        event.preventDefault()
+        const formData = new FormData(contactForm)
+        const payload = {
+          name: String(formData.get('name') || '').trim(),
+          phone: String(formData.get('phone') || '').trim(),
+          email: String(formData.get('email') || '').trim(),
+          message: String(formData.get('message') || '').trim(),
+        }
+        const verification = window.KemiteForm.contact(payload)
+        if (!verification.ok) {
+          showContactStatus('error', verification.message)
+          return
+        }
+
+        contactSubmit.textContent = '提交中...'
+        contactSubmit.disabled = true
+        contactStatus.hidden = true
+
+        try {
+          const data = await window.KemiteRequest.request('/api/contact', {
+            method: 'POST',
+            body: JSON.stringify(payload),
+            baseUrl: '',
+          })
+
+          if (data?.success !== true) {
+            throw new Error(data?.error || '留言提交失败，请稍后再试')
+          }
+
+          contactForm.reset()
+          showContactStatus('success', '留言已提交，我们会尽快与您联系。')
+        } catch (error) {
+          showContactStatus('error', error instanceof Error ? error.message : '接口未连接：请用 npm run serve 启动官网服务后再提交。')
+        } finally {
+          contactSubmit.textContent = '提交留言'
+          contactSubmit.disabled = false
+        }
+      })
+    </script>
+  </body>
+</html>

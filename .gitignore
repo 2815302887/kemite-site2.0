@@ -1,0 +1,49 @@
+# dependencies
+node_modules/
+
+# environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.*.local
+
+# keep examples
+!.env.example
+!.env.production.example
+!.env.production.example.production-ready
+
+# logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# build output
+dist/
+.cache/
+.vite/
+
+# backups and runtime data
+backups/
+*.backup
+*.bak
+*.tmp
+*.verify-backup-*
+*.tar.gz
+
+# local runtime data
+data/*.json
+data/*.log
+
+# uploaded/generated assets that may contain production data
+public/products/
+public/datasheets/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

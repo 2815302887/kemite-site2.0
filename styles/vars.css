@@ -1,0 +1,35 @@
+:root {
+  --color-ink: #111827;
+  --color-muted: #5c6675;
+  --color-line: rgba(30, 41, 59, 0.14);
+  --color-panel: rgba(255, 255, 255, 0.78);
+  --color-brand: #123456;
+  --color-accent: #0f766e;
+  --color-accent-dark: #0a4b46;
+  --color-danger-bg: #fef2f2;
+  --color-danger: #b91c1c;
+  --color-page-bg: #f1f5f9;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --card-radius-lg: 16px;
+  --radius-xl: 20px;
+  --gap-xs: 6px;
+  --gap-sm: 10px;
+  --gap-md: 16px;
+  --gap-lg: 24px;
+  --gap-xl: 32px;
+  --space-sm: 10px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 20px;
+  --text-xl: 24px;
+  --card-min-height: 320px;
+  --card-media-height: 220px;
+  --control-height: 44px;
+  --shadow-panel: 0 24px 70px rgba(0, 0, 0, 0.2);
+  --shadow-floating: 0 30px 90px rgba(30, 41, 59, 0.18);
+}

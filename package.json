@@ -1,0 +1,32 @@
+{
+  "type": "module",
+  "scripts": {
+    "build": "node tools/build-r3f-bundle.js && node tools/embed-model-data.js",
+    "models:optimize": "node tools/optimize-glb-models.js",
+    "serve": "node -r dotenv/config server/src/index.js dotenv_config_path=.env.development",
+    "server": "node -r dotenv/config server/src/index.js dotenv_config_path=.env.development",
+    "start": "node -r dotenv/config server/src/index.js dotenv_config_path=.env.production",
+    "start:test": "node -r dotenv/config server/src/index.js dotenv_config_path=.env.test",
+    "db:init": "node server/src/run-sql.js"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.2.0",
+    "mysql2": "^3.15.3"
+  },
+  "devDependencies": {
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.1",
+    "@vitejs/plugin-react": "^6.0.3",
+    "esbuild": "^0.28.1",
+    "gltf-pipeline": "^4.3.1",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "three": "^0.185.1",
+    "vite": "^8.1.3"
+  }
+}

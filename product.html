@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>产品详情 - 可米特焊接材料</title>
+    <meta name="description" content="查看可米特锡膏与贴片红胶产品详情、应用说明、关键参数和资料下载。" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="可米特焊接材料产品详情" />
+    <meta property="og:description" content="锡膏、贴片红胶产品参数、应用与资料下载。" />
+    <meta property="og:image" content="public/images/brand/home-hero.png" />
+    <link rel="stylesheet" href="styles/vars.css" />
+    <link rel="stylesheet" href="styles/common.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <nav class="nav">
+        <a class="brand" href="index.html" aria-label="可米特焊接材料首页">
+          <span class="mark">KMT</span>
+          <span>可米特焊接材料</span>
+        </a>
+        <button id="navToggle" class="nav-toggle" type="button" aria-label="打开导航" aria-expanded="false">☰</button>
+        <div id="navLinks" class="nav-links">
+          <a href="index.html">首页</a>
+          <a class="active" href="products.html">产品中心</a>
+          <a href="about.html">关于我们</a>
+          <a href="contact.html">联系我们</a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="productDetail">
+      <section class="page-hero">
+        <div class="wrap split-grid">
+          <div>
+            <p id="productId" class="eyebrow">产品详情</p>
+            <h1 id="productName">正在加载产品...</h1>
+            <p id="productSummary" class="lead"></p>
+            <div id="productActions" class="actions"></div>
+          </div>
+          <div class="info-card product-editor-preview">
+            <img id="productImage" src="" alt="" loading="lazy" />
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="wrap split-grid" style="align-items: start">
+          <article class="info-card">
+            <div class="info-body">
+              <p class="eyebrow">产品介绍</p>
+              <h2>应用与制程说明</h2>
+              <p id="productDetailText" style="margin-top: 18px"></p>
+            </div>
+          </article>
+          <article class="info-card">
+            <div class="info-body">
+              <p class="eyebrow">技术参数</p>
+              <h2>关键参数</h2>
+              <dl id="productMeta" class="meta"></dl>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <h2>可米特焊接材料</h2>
+        <p>锡膏、贴片红胶、SMT 工艺支持。</p>
+      </div>
+    </footer>
+
+    <script src="src/utils/format.js"></script>
+    <script src="src/utils/resourceLazy.js"></script>
+    <script src="src/utils/request.js"></script>
+    <script src="src/utils/productCenter.js"></script>
+    <script src="public/products-data.js?v=20260625"></script>
+    <script>
+      const navToggle = document.getElementById('navToggle')
+      const navLinks = document.getElementById('navLinks')
+      navToggle.addEventListener('click', () => {
+        const isOpen = navLinks.classList.toggle('is-open')
+        navToggle.setAttribute('aria-expanded', String(isOpen))
+      })
+
+      const fallbackProducts = Array.isArray(window.KEMITE_PRODUCTS) ? window.KEMITE_PRODUCTS : []
+      const productId = new URLSearchParams(window.location.search).get('id')
+      const productName = document.getElementById('productName')
+      const productIdNode = document.getElementById('productId')
+      const productSummary = document.getElementById('productSummary')
+      const productDetailText = document.getElementById('productDetailText')
+      const productImage = document.getElementById('productImage')
+      const productMeta = document.getElementById('productMeta')
+      const productActions = document.getElementById('productActions')
+
+      function resolveApiBase() {
+        const isLocalHost = ['127.0.0.1', 'localhost'].includes(window.location.hostname)
+        const isStaticDevServer = window.location.port === '8080'
+        if (isLocalHost || isStaticDevServer) {
+          const host = window.location.hostname === 'localhost' ? '127.0.0.1' : window.location.hostname
+          return `http://${host}:3001`
+        }
+        return window.location.origin
+      }
+
+      const apiBase = resolveApiBase()
+
+      function renderProduct(product) {
+        window.KemiteProductCenter.renderProductDetail(product, {
+          root: document.getElementById('productDetail'),
+          image: productImage,
+          id: productIdNode,
+          title: productName,
+          summary: productSummary,
+          detail: productDetailText,
+          meta: productMeta,
+          actions: productActions,
+        }, {
+          mode: 'detail',
+          siteName: '可米特焊接材料',
+        })
+      }
+
+      async function loadProduct() {
+        const products = await window.KemiteProductCenter.getProducts({
+          apiBase,
+          fallback: fallbackProducts,
+        })
+        const product = window.KemiteProductCenter.findProductById(products, productId)
+        renderProduct(product)
+      }
+
+      loadProduct()
+    </script>
+  </body>
+</html>

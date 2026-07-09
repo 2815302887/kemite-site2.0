@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>宁波可米特焊接材料有限公司 - 产品中心</title>
+    <meta name="description" content="宁波可米特焊接材料有限公司产品中心，提供中温锡膏、高温锡膏、含铅锡膏、无铅锡膏和贴片红胶。" />
+    <meta name="keywords" content="锡膏产品,SMT锡膏,中温锡膏,高温锡膏,贴片红胶,焊接材料" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="宁波可米特焊接材料有限公司产品中心" />
+    <meta property="og:description" content="按名称、应用、合金和类型筛选锡膏与贴片红胶产品。" />
+    <meta property="og:image" content="public/images/brand/home-hero.png" />
+    <link rel="stylesheet" href="styles/vars.css" />
+    <link rel="stylesheet" href="styles/common.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <nav class="nav">
+        <a class="brand" href="index.html" aria-label="宁波可米特焊接材料有限公司首页">
+          <span class="mark">KMT</span>
+          <span>宁波可米特焊接材料有限公司</span>
+        </a>
+        <button id="navToggle" class="nav-toggle" type="button" aria-label="打开导航" aria-expanded="false">☰</button>
+        <div id="navLinks" class="nav-links">
+          <a href="index.html">首页</a>
+          <a class="active" href="products.html">产品中心</a>
+          <a href="about.html">关于我们</a>
+          <a href="contact.html">联系我们</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <div class="wrap">
+          <p class="eyebrow">产品中心</p>
+          <h1>锡膏与贴片红胶产品</h1>
+          <p class="lead">按名称、应用、合金和类型筛选产品。卡片显示核心信息，点击详情可查看完整介绍和资料下载。</p>
+
+          <div class="toolbar">
+            <label>
+              <span class="form-label">搜索产品</span>
+              <input id="productSearch" class="form-control" type="search" placeholder="输入型号、名称、应用或合金" />
+            </label>
+            <label>
+              <span class="form-label">产品类型</span>
+              <select id="categoryFilter" class="form-control">
+                <option value="all">全部产品</option>
+                <option value="medium">中温锡膏</option>
+                <option value="high">高温锡膏</option>
+                <option value="leaded">含铅锡膏</option>
+                <option value="leadfree">无铅锡膏</option>
+                <option value="redglue">贴片红胶</option>
+              </select>
+            </label>
+            <label>
+              <span class="form-label">应用场景</span>
+              <select id="applicationFilter" class="form-control">
+                <option value="all">全部应用</option>
+                <option value="消费电子">消费电子</option>
+                <option value="精密模块">精密模块</option>
+                <option value="细间距器件">细间距器件</option>
+                <option value="车载电源">车载电源</option>
+                <option value="通信设备">通信设备</option>
+                <option value="维修返修">维修返修</option>
+                <option value="连接器焊接">连接器焊接</option>
+                <option value="LED电源">LED电源</option>
+                <option value="波峰焊固定">波峰焊固定</option>
+                <option value="点胶固定">点胶固定</option>
+                <option value="生产领用">生产领用</option>
+              </select>
+            </label>
+            <label>
+              <span class="form-label">合金体系</span>
+              <select id="alloyFilter" class="form-control">
+                <option value="all">全部合金</option>
+                <option value="Sn64Bi35Ag1">Sn64Bi35Ag1</option>
+                <option value="SAC305">SAC305</option>
+                <option value="Sn63Pb37">Sn63Pb37</option>
+                <option value="红胶">红胶</option>
+              </select>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="wrap">
+          <div id="productGrid" class="grid product-grid"></div>
+          <div id="emptyState" class="empty-state">
+            <h3>没有匹配的产品</h3>
+            <p>请调整搜索词或筛选条件后再试。</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div id="productModal" class="modal-backdrop" aria-hidden="true">
+      <div class="product-modal" role="dialog" aria-modal="true" aria-labelledby="modalProductName">
+        <div class="product-modal-grid">
+          <div class="product-modal-media">
+            <img id="modalProductImage" src="" alt="" loading="lazy" />
+          </div>
+          <div class="product-modal-body">
+            <button id="modalCloseButton" class="button modal-close" type="button" aria-label="关闭">×</button>
+            <small id="modalProductId"></small>
+            <h2 id="modalProductName"></h2>
+            <p id="modalProductSummary"></p>
+            <p id="modalProductDetail"></p>
+            <dl id="modalProductMeta" class="meta"></dl>
+            <div id="modalProductActions" class="product-actions"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <div class="wrap">
+        <h2>宁波可米特焊接材料有限公司</h2>
+        <p>锡膏、贴片红胶、SMT 工艺支持。</p>
+      </div>
+    </footer>
+
+    <script src="src/utils/format.js"></script>
+    <script src="src/utils/resourceLazy.js"></script>
+    <script src="src/utils/cardRender.js"></script>
+    <script src="src/utils/debounce.js"></script>
+    <script src="src/utils/request.js"></script>
+    <script src="src/components/productCard.js"></script>
+    <script src="src/utils/productCenter.js"></script>
+    <script src="public/products-data.js?v=20260625"></script>
+    <script>
+      const navToggle = document.getElementById('navToggle')
+      const navLinks = document.getElementById('navLinks')
+      navToggle.addEventListener('click', () => {
+        const isOpen = navLinks.classList.toggle('is-open')
+        navToggle.setAttribute('aria-expanded', String(isOpen))
+      })
+
+      const productSearch = document.getElementById('productSearch')
+      const categoryFilter = document.getElementById('categoryFilter')
+      const applicationFilter = document.getElementById('applicationFilter')
+      const alloyFilter = document.getElementById('alloyFilter')
+      const productGrid = document.getElementById('productGrid')
+      const emptyState = document.getElementById('emptyState')
+      const productModal = document.getElementById('productModal')
+      const modalCloseButton = document.getElementById('modalCloseButton')
+      const modalProductImage = document.getElementById('modalProductImage')
+      const modalProductId = document.getElementById('modalProductId')
+      const modalProductName = document.getElementById('modalProductName')
+      const modalProductSummary = document.getElementById('modalProductSummary')
+      const modalProductDetail = document.getElementById('modalProductDetail')
+      const modalProductMeta = document.getElementById('modalProductMeta')
+      const modalProductActions = document.getElementById('modalProductActions')
+      let products = []
+      const fallbackProducts = Array.isArray(window.KEMITE_PRODUCTS) ? window.KEMITE_PRODUCTS : []
+
+      const apiBase = ''
+
+      function renderProducts() {
+        const filters = window.KemiteProductCenter.readFilters({
+          search: productSearch,
+          category: categoryFilter,
+          application: applicationFilter,
+          alloy: alloyFilter,
+        })
+        const visibleProducts = window.KemiteProductCenter.filterProducts(products, filters)
+
+        productGrid.innerHTML = visibleProducts.map((product) => window.KemiteProductCenter.createProductCard(product)).join('')
+        window.KemiteLazy?.observeImages(productGrid)
+
+        emptyState.style.display = visibleProducts.length === 0 ? 'block' : 'none'
+        focusPreviewProduct()
+      }
+
+      function focusPreviewProduct() {
+        const previewId = new URLSearchParams(window.location.search).get('preview')
+        if (!previewId) return
+
+        const card = productGrid.querySelector(`[data-product-id="${CSS.escape(previewId)}"]`)
+        if (!card) return
+
+        card.classList.add('preview-target')
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+
+      function openProductModal(productId) {
+        const product = window.KemiteProductCenter.findProductById(products, productId)
+        window.KemiteProductCenter.renderProductDetail(product, {
+          root: productModal,
+          image: modalProductImage,
+          id: modalProductId,
+          title: modalProductName,
+          summary: modalProductSummary,
+          detail: modalProductDetail,
+          meta: modalProductMeta,
+          actions: modalProductActions,
+        }, {
+          mode: 'modal',
+          updateTitle: false,
+        })
+        productModal.classList.add('is-open')
+        productModal.setAttribute('aria-hidden', 'false')
+      }
+
+      function closeProductModal() {
+        productModal.classList.remove('is-open')
+        productModal.setAttribute('aria-hidden', 'true')
+      }
+
+      async function loadProducts() {
+        products = await window.KemiteProductCenter.getProducts({
+          apiBase,
+          fallback: fallbackProducts,
+        })
+        if (products.length > 0) {
+          renderProducts()
+          return
+        }
+
+        emptyState.style.display = 'block'
+        emptyState.querySelector('h3').textContent = '产品加载失败'
+        emptyState.querySelector('p').textContent = '请检查产品数据或稍后重试。'
+      }
+
+      productSearch.addEventListener('input', window.KemiteTiming.debounce(renderProducts, 300))
+      categoryFilter.addEventListener('change', renderProducts)
+      applicationFilter.addEventListener('change', renderProducts)
+      alloyFilter.addEventListener('change', renderProducts)
+      productGrid.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-action="detail"]')
+        if (!button) return
+        openProductModal(button.dataset.id)
+      })
+      modalCloseButton.addEventListener('click', closeProductModal)
+      productModal.addEventListener('click', (event) => {
+        if (event.target === productModal) closeProductModal()
+      })
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closeProductModal()
+      })
+      loadProducts()
+    </script>
+  </body>
+</html>

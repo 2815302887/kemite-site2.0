@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>可米特焊接材料 - 管理员登录</title>
+    <link rel="stylesheet" href="styles/vars.css" />
+    <link rel="stylesheet" href="styles/common.css" />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      body.admin-page { background: var(--brand); }
+      .admin-shell { min-height: 100vh; padding: 32px 16px; }
+      .login-panel { display: grid; width: min(1080px, 100%); overflow: hidden; border-radius: 8px; background: white; box-shadow: 0 24px 70px rgba(0, 0, 0, 0.2); }
+      .login-brand { display: none; background: var(--brand); color: white; padding: 42px; }
+      .login-main { padding: 32px; }
+      .admin-dashboard { min-height: 100vh; background: #f1f5f9; }
+      .admin-topbar { border-bottom: 1px solid var(--line); background: white; }
+      .message-card { border: 1px solid var(--line); border-radius: 8px; background: white; padding: 22px; }
+      .message-body { margin: 18px 0 0; border-radius: 6px; background: #f8fafc; padding: 16px; color: #334155; line-height: 1.8; white-space: pre-wrap; }
+      .message-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; margin-top: 14px; }
+      .admin-tabs { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+      .admin-tab { border: 1px solid var(--line); background: white; color: var(--brand); }
+      .admin-tab.active { background: var(--brand); color: white; }
+      .admin-panel { margin-top: 28px; }
+      .product-admin-grid { display: grid; gap: 20px; grid-template-columns: minmax(240px, 0.8fr) minmax(0, 1.2fr); align-items: start; }
+      .product-admin-grid > *,
+      .product-editor,
+      .product-editor .info-body,
+      .product-editor .section-head > * { min-width: 0; }
+      .product-list { display: grid; gap: 10px; }
+      .product-list-button { width: 100%; border: 1px solid var(--line); border-radius: 8px; background: white; padding: 14px; color: var(--brand); text-align: left; cursor: pointer; }
+      .product-list-button.active { border-color: var(--brand); background: #f8fafc; }
+      .product-list-button small { display: block; color: var(--muted); }
+      .product-editor { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+      .product-editor-preview { display: grid; aspect-ratio: 4 / 3; place-items: center; border: 1px solid var(--line); border-radius: 8px; background: white; padding: 18px; }
+      .product-editor-preview img { max-width: 100%; max-height: 100%; object-fit: contain; }
+      .inline-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+      .product-editor .section-head { display: grid; width: 100%; min-width: 0; grid-template-columns: minmax(0, 1fr); align-items: flex-start; }
+      .product-editor .section-head .inline-actions { display: grid; width: 100%; max-width: 100%; min-width: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); justify-content: stretch; }
+      .product-editor .section-head .inline-actions .button { width: 100%; padding: 0 12px; white-space: nowrap; }
+      #productSaveButton { grid-column: 1 / -1; }
+      #productEditorTitle { overflow-wrap: anywhere; }
+      .file-control { position: relative; overflow: hidden; display: inline-flex; align-items: center; justify-content: center; }
+      .file-control input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+      .product-editor .featured-grid { grid-template-columns: 1fr; }
+      @media (max-width: 760px) {
+        .product-admin-grid { grid-template-columns: 1fr; }
+      }
+      @media (min-width: 900px) {
+        .login-panel { grid-template-columns: 0.9fr 1.1fr; }
+        .login-brand { display: block; }
+        .login-main { padding: 42px; }
+      }
+    </style>
+  </head>
+  <body class="admin-page">
+    <div id="loginView" class="admin-shell">
+      <div class="wrap" style="display: grid; min-height: calc(100vh - 64px); place-items: center">
+        <div class="login-panel">
+          <aside class="login-brand">
+            <a class="brand" href="index.html" style="color: white">
+              <span class="mark" style="background: white; color: var(--brand)">KMT</span>
+              <span>返回官网</span>
+            </a>
+            <div style="margin-top: 80px">
+              <p class="eyebrow">后台管理系统</p>
+              <h1 style="color: white">管理员登录</h1>
+              <p style="color: #cbd5e1; line-height: 1.8">用于查看官网联系表单留言，与前台企业官网保持联动。</p>
+            </div>
+          </aside>
+
+          <main class="login-main">
+            <p class="eyebrow">管理员后台</p>
+            <h2>登录管理系统</h2>
+            <p style="color: var(--muted)">请输入管理员账号和密码。</p>
+
+            <form id="loginForm" style="margin-top: 30px">
+              <label>
+                <span class="form-label">用户名</span>
+                <input class="form-control" name="username" autocomplete="username" placeholder="请输入用户名" required />
+              </label>
+              <label style="display: block; margin-top: 18px">
+                <span class="form-label">密码</span>
+                <input class="form-control" name="password" type="password" autocomplete="current-password" placeholder="请输入密码" required />
+              </label>
+              <button id="loginButton" class="button primary" type="submit" style="width: 100%; margin-top: 22px">登录</button>
+              <p id="loginError" style="display: none; margin-top: 16px; border-radius: 6px; background: #fef2f2; padding: 12px; color: #b91c1c"></p>
+            </form>
+          </main>
+        </div>
+      </div>
+    </div>
+
+    <div id="dashboardView" class="admin-dashboard" style="display: none">
+      <div class="admin-layout">
+        <aside class="admin-sidebar">
+          <a class="brand" href="index.html">
+            <span class="mark">KMT</span>
+            <span>可米特后台</span>
+          </a>
+          <div class="admin-side-nav" role="tablist" aria-label="后台管理分类">
+            <button class="button admin-tab active" type="button" data-tab="contacts">留言管理</button>
+            <button class="button admin-tab" type="button" data-tab="products">产品管理</button>
+            <button class="button admin-tab" type="button" data-tab="images">图片库</button>
+          </div>
+          <div class="actions" style="margin-top: 34px">
+            <a class="button" href="index.html">前台官网</a>
+            <button id="logoutButton" class="button primary" type="button">退出登录</button>
+          </div>
+        </aside>
+
+        <main class="admin-main">
+          <header class="admin-topbar">
+            <div class="nav">
+              <div>
+                <p class="eyebrow">后台管理系统</p>
+                <h2>运营内容管理</h2>
+              </div>
+            </div>
+          </header>
+
+          <div class="wrap" style="padding-top: 32px; padding-bottom: 48px">
+        <div class="grid featured-grid">
+          <article class="card"><p>留言总数</p><h2 id="totalCount">0</h2></article>
+          <article class="card"><p>未读留言</p><h2 id="unreadCount">0</h2></article>
+          <article class="card"><p>系统状态</p><h2 id="systemState">--</h2></article>
+        </div>
+
+        <section id="contactsPanel" class="admin-panel">
+          <div class="toolbar">
+            <label>
+              <span class="form-label">搜索留言</span>
+              <input id="messageSearch" class="form-control" type="search" placeholder="搜索姓名、电话、邮箱或留言内容" />
+            </label>
+            <label>
+              <span class="form-label">状态</span>
+              <select id="messageFilter" class="form-control">
+                <option value="all">全部留言</option>
+                <option value="unread">未读</option>
+                <option value="read">已读</option>
+              </select>
+            </label>
+            <button id="markAllReadButton" class="button" type="button">全部标记已读</button>
+            <button id="exportContactsButton" class="button" type="button">导出 Excel</button>
+          </div>
+
+          <div id="messageStatus" class="info-card" style="margin-top: 28px">
+            <div class="info-body">正在加载留言...</div>
+          </div>
+          <div id="messageList" class="grid" style="margin-top: 28px"></div>
+        </section>
+
+        <section id="productsPanel" class="admin-panel" style="display: none">
+          <div class="product-admin-grid">
+            <aside class="info-card">
+              <div class="info-body">
+                <h3>产品列表</h3>
+                <p style="color: var(--muted)">选择一个产品后，在右侧修改资料。</p>
+                <label style="display: block; margin-top: 18px">
+                  <span class="form-label">搜索产品</span>
+                  <input id="productAdminSearch" class="form-control" type="search" placeholder="型号、名称、应用或合金" />
+                </label>
+                <label style="display: block; margin-top: 12px">
+                  <span class="form-label">每页数量</span>
+                  <select id="productPageSize" class="form-control">
+                    <option value="6">6 条</option>
+                    <option value="10" selected>10 条</option>
+                    <option value="20">20 条</option>
+                  </select>
+                </label>
+                <div class="inline-actions" style="margin-top: 18px">
+                  <button id="productCreateButton" class="button primary" type="button">新增产品</button>
+                  <button id="productMoveUpButton" class="button" type="button">上移</button>
+                  <button id="productMoveDownButton" class="button" type="button">下移</button>
+                </div>
+                <div id="productAdminList" class="product-list" style="margin-top: 18px"></div>
+                <div id="productPagination"></div>
+              </div>
+            </aside>
+
+            <form id="productForm" class="info-card product-editor">
+              <div class="info-body product-editor">
+                <div class="section-head" style="margin-bottom: 0">
+                  <div>
+                    <p class="eyebrow">产品管理</p>
+                    <h3 id="productEditorTitle">请选择产品</h3>
+                  </div>
+                  <div class="inline-actions">
+                    <button id="productPreviewButton" class="button" type="button">前台预览</button>
+                    <button id="productDeleteButton" class="button" type="button">删除</button>
+                    <button id="productSaveButton" class="button primary" type="submit">保存产品</button>
+                  </div>
+                </div>
+
+                <div class="product-editor-preview">
+                  <img id="productPreview" src="" alt="产品图片预览" loading="lazy" />
+                </div>
+
+                <input type="hidden" name="id" />
+                <div class="grid featured-grid">
+                  <label>
+                    <span class="form-label">产品名称</span>
+                    <input class="form-control" name="name" required />
+                  </label>
+                  <label>
+                    <span class="form-label">分类</span>
+                    <input class="form-control" name="category" placeholder="medium, leadfree" required />
+                  </label>
+                  <label>
+                    <span class="form-label">应用场景</span>
+                    <input class="form-control" name="application" required />
+                  </label>
+                </div>
+
+                <div class="grid featured-grid">
+                  <label>
+                    <span class="form-label">合金体系</span>
+                    <input class="form-control" name="alloy" required />
+                  </label>
+                  <label>
+                    <span class="form-label">图片路径</span>
+                    <input id="productImageInput" class="form-control" name="image" placeholder="public/products/example.png" required />
+                  </label>
+                  <label>
+                    <span class="form-label">关键词</span>
+                    <input class="form-control" name="keywords" />
+                  </label>
+                </div>
+
+                <div class="inline-actions">
+                  <label class="button file-control">
+                    上传产品图片
+                    <input id="productImageUpload" type="file" accept="image/png,image/jpeg,image/webp" />
+                  </label>
+                  <label class="button file-control">
+                    上传产品资料
+                    <input id="productDatasheetUpload" type="file" accept="application/pdf" />
+                  </label>
+                </div>
+
+                <label>
+                  <span class="form-label">资料 PDF 路径</span>
+                  <input class="form-control" name="datasheet" placeholder="public/datasheets/example.pdf" />
+                </label>
+
+                <label>
+                  <span class="form-label">产品简介</span>
+                  <textarea class="form-control textarea" name="summary" required></textarea>
+                </label>
+                <label>
+                  <span class="form-label">详细介绍</span>
+                  <textarea class="form-control textarea" name="detail" required></textarea>
+                </label>
+                <label>
+                  <span class="form-label">参数信息</span>
+                  <textarea class="form-control textarea" name="meta" placeholder="每行一条：标签：内容"></textarea>
+                </label>
+                <p id="productStatus" style="display: none; border-radius: 6px; padding: 12px"></p>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <section id="imagesPanel" class="admin-panel" style="display: none">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">图片库</p>
+              <h2>已上传产品图片</h2>
+            </div>
+            <div class="inline-actions">
+              <button id="batchDeleteImagesButton" class="button" type="button">批量删除</button>
+              <button id="refreshImagesButton" class="button" type="button">刷新图片</button>
+            </div>
+          </div>
+          <div id="imageLibraryStatus" class="info-card" style="display: none; margin-bottom: 20px">
+            <div class="info-body"></div>
+          </div>
+          <div id="imageLibraryList" class="grid product-grid"></div>
+        </section>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="src/utils/format.js"></script>
+    <script src="src/utils/resourceLazy.js"></script>
+    <script src="src/utils/fileUtil.js"></script>
+    <script src="src/utils/debounce.js"></script>
+    <script src="src/utils/request.js"></script>
+    <script src="src/components/pagination.js"></script>
+    <script src="src/components/confirmModal.js"></script>
+    <script src="src/admin/adminShared.js"></script>
+    <script src="src/admin/messageAdmin.js"></script>
+    <script src="src/admin/productAdmin.js"></script>
+    <script src="src/admin/imageAdmin.js"></script>
+    <script>
+      const apiBase = ''
+
+      const loginView = document.getElementById('loginView')
+      const dashboardView = document.getElementById('dashboardView')
+      const loginForm = document.getElementById('loginForm')
+      const loginButton = document.getElementById('loginButton')
+      const loginError = document.getElementById('loginError')
+      const logoutButton = document.getElementById('logoutButton')
+      const tabButtons = document.querySelectorAll('[data-tab]')
+      const contactsPanel = document.getElementById('contactsPanel')
+      const productsPanel = document.getElementById('productsPanel')
+      const imagesPanel = document.getElementById('imagesPanel')
+
+      const shared = window.KemiteAdminShared.createAdminShared({
+        apiBase,
+        nodes: { loginView, dashboardView, loginError },
+      })
+
+      const messageAdmin = window.KemiteMessageAdmin.createMessageAdmin(shared, {
+        totalCount: document.getElementById('totalCount'),
+        unreadCount: document.getElementById('unreadCount'),
+        systemState: document.getElementById('systemState'),
+        messageStatus: document.getElementById('messageStatus'),
+        messageList: document.getElementById('messageList'),
+        messageSearch: document.getElementById('messageSearch'),
+        messageFilter: document.getElementById('messageFilter'),
+        markAllReadButton: document.getElementById('markAllReadButton'),
+        exportContactsButton: document.getElementById('exportContactsButton'),
+      })
+
+      const imageAdmin = window.KemiteImageAdmin.createImageAdmin(shared, {
+        imageLibraryList: document.getElementById('imageLibraryList'),
+        imageLibraryStatus: document.getElementById('imageLibraryStatus'),
+        batchDeleteImagesButton: document.getElementById('batchDeleteImagesButton'),
+        refreshImagesButton: document.getElementById('refreshImagesButton'),
+      })
+
+      const productAdmin = window.KemiteProductAdmin.createProductAdmin(shared, {
+        productAdminList: document.getElementById('productAdminList'),
+        productAdminSearch: document.getElementById('productAdminSearch'),
+        productPageSize: document.getElementById('productPageSize'),
+        productPagination: document.getElementById('productPagination'),
+        productForm: document.getElementById('productForm'),
+        productEditorTitle: document.getElementById('productEditorTitle'),
+        productPreview: document.getElementById('productPreview'),
+        productImageInput: document.getElementById('productImageInput'),
+        productCreateButton: document.getElementById('productCreateButton'),
+        productDeleteButton: document.getElementById('productDeleteButton'),
+        productMoveUpButton: document.getElementById('productMoveUpButton'),
+        productMoveDownButton: document.getElementById('productMoveDownButton'),
+        productPreviewButton: document.getElementById('productPreviewButton'),
+        productImageUpload: document.getElementById('productImageUpload'),
+        productDatasheetUpload: document.getElementById('productDatasheetUpload'),
+        productSaveButton: document.getElementById('productSaveButton'),
+        productStatus: document.getElementById('productStatus'),
+      }, {
+        onImageLibraryDirty: imageAdmin.markDirty,
+      })
+
+      function switchTab(tab) {
+        tabButtons.forEach((button) => button.classList.toggle('active', button.dataset.tab === tab))
+        contactsPanel.style.display = tab === 'contacts' ? 'block' : 'none'
+        productsPanel.style.display = tab === 'products' ? 'block' : 'none'
+        imagesPanel.style.display = tab === 'images' ? 'block' : 'none'
+
+        if (tab === 'products' && !productAdmin.hasProducts()) productAdmin.loadProducts()
+        if (tab === 'images' && !imageAdmin.hasImages()) imageAdmin.loadImages()
+      }
+
+      loginForm.addEventListener('submit', async (event) => {
+        event.preventDefault()
+        loginError.style.display = 'none'
+        loginButton.disabled = true
+        loginButton.textContent = '登录中...'
+
+        const formData = new FormData(loginForm)
+        try {
+          const data = await window.KemiteRequest.request('/api/admin/login', {
+            baseUrl: apiBase,
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username: formData.get('username'),
+              password: formData.get('password'),
+            }),
+          })
+          localStorage.setItem('adminToken', data.token)
+          await messageAdmin.loadContacts()
+        } catch (error) {
+          shared.setError(error instanceof Error ? error.message : '登录失败，请稍后重试')
+        } finally {
+          loginButton.disabled = false
+          loginButton.textContent = '登录'
+        }
+      })
+
+      logoutButton.addEventListener('click', () => {
+        localStorage.removeItem('adminToken')
+        shared.showLogin()
+      })
+
+      tabButtons.forEach((button) => {
+        button.addEventListener('click', () => switchTab(button.dataset.tab))
+      })
+
+      messageAdmin.init()
+      productAdmin.init()
+      imageAdmin.init()
+      messageAdmin.loadContacts()
+    </script>
+  </body>
+</html>
