@@ -1,70 +1,41 @@
-# ��������ҵ�����ƶ˲����ֲ�
+# Kemite Website 部署指南
 
-���ĵ����ڰѿ�������ҵ�������� Linux �Ʒ���������ǰ��Ŀ���á�һ�� Node/Express ���� + MySQL + Nginx ����������������ʽ��
+本文档说明如何在 Ubuntu 服务器上部署 Kemite Website。推荐使用 Node.js + MySQL + PM2 + Nginx + HTTPS 的方式运行，Nginx 负责公网入口，Express 服务运行在本机端口。
 
-�����ʱû�������� HTTPS��Ҳ������ʹ�÷��������� IP ���ʡ�
+## 1. 服务器准备
 
-## 1. ����Ŀ��
-
-�Ƽ�����Ŀ¼��
-
-```bash
-/var/www/kemite-site
-```
-
-�Ƽ� Node ����˿ڣ�
-
-```bash
-3001
-```
-
-�������ʷ�ʽ��
-
-```text
-http://����������IP/
-```
-
-����Ժ����������� HTTPS������ʷ�ʽ��ɣ�
-
-```text
-https://www.example.com/
-```
-
-## 2. �����ܹ�
-
-��������ֻ����һ�� Node ����
-
-```text
-Nginx :80/:443
-  ��
-127.0.0.1:3001
-  ��
-Node/Express
-  ������ ��̬ҳ�棺index.html��products.html��admin.html ��
-  ������ ��̬��Դ��styles.css��public/products��public/datasheets
-  ������ API��/api/products��/api/contact��/api/admin/*
-```
-
-��Ҫ�ڷ������ϵ������ `python -m http.server` ��Ϊǰ̨�������Ǳ�����ʱԤ���õģ����������ᵼ��ǰ�˺ͽӿڲ𿪣����׳��ֿ��򡢽ӿڵ�ַ���󡢺�̨�ϴ�·����ͬ�������⡣
-
-## 3. ������Ҫ��
-
-�Ƽ�ϵͳ��
+推荐系统：
 
 - Ubuntu 22.04 LTS
 - Ubuntu 24.04 LTS
-- Debian 12
 
-��Ҫ�������
+更新系统：
 
-- Node.js 20 ����߰汾
-- npm
-- MySQL 8 ����ݰ汾
-- Nginx
-- PM2
-- Git
+```bash
+sudo apt update
+sudo apt upgrade -y
+```
 
-������
+安装基础工具：
+
+```bash
+sudo apt install -y git curl build-essential nginx mysql-server
+```
+
+安装 Node.js 20：
+
+```bash
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
+```
+
+安装 PM2：
+
+```bash
+sudo npm install -g pm2
+```
+
+检查版本：
 
 ```bash
 node -v
@@ -72,331 +43,214 @@ npm -v
 mysql --version
 nginx -v
 pm2 -v
-git --version
 ```
 
-## 4. ��װ��������
+## 2. 部署目录
 
-����ϵͳ��
+建议部署到：
 
 ```bash
-sudo apt update
-sudo apt upgrade -y
+/var/www/kemite-site
 ```
 
-��װ���������
+拉取代码：
 
 ```bash
-sudo apt install -y git nginx mysql-server curl
-```
-
-���������û�� Node.js 20+������ʹ�� NodeSource ��װ��
-
-```bash
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt install -y nodejs
-```
-
-��װ PM2��
-
-```bash
-sudo npm install -g pm2
-```
-
-## 5. ��ȡ��Ŀ����
-
-���벿��Ŀ¼�ϼ���
-
-```bash
-sudo mkdir -p /var/www
-cd /var/www
-```
-
-������״β���
-
-```bash
-sudo git clone https://github.com/2815302887/kemite-site.git kemite-site
+sudo mkdir -p /var/www/kemite-site
+sudo chown -R $USER:$USER /var/www/kemite-site
+git clone <your-repository-url> /var/www/kemite-site
 cd /var/www/kemite-site
 ```
 
-���Ŀ¼�Ѿ����ڣ������ȱ������ݣ��ٸ��´��롣
-
-��Ҫ��������ݰ�����
+如果是覆盖发布，先备份以下数据目录：
 
 ```text
-.env
 products.json
 public/products/
 public/datasheets/
-public/products-data.js
-backups/products/
+backups/
 ```
 
-��Ҫ���ɾ����ЩĿ¼���ļ������ǿ��ܰ�����̨ά�����Ĳ�Ʒ���ϡ��ͻ��ϴ��ļ����Զ����ݡ�
+## 3. MySQL 配置
 
-## 6. ���¾���Ŀ�İ�ȫ����
-
-������������Ѿ��о���Ŀ���Ƽ������淽ʽ���¡�
-
-������ĿĿ¼��
-
-```bash
-cd /var/www/kemite-site
-```
-
-�ȱ��ݹؼ����ݣ�
-
-```bash
-sudo mkdir -p /var/backups/kemite-site
-sudo tar -czf /var/backups/kemite-site/kemite-data-$(date +%Y%m%d-%H%M%S).tar.gz \
-  .env \
-  products.json \
-  public/products \
-  public/datasheets \
-  public/products-data.js \
-  backups/products
-```
-
-��ȡ���´��룺
-
-```bash
-git fetch origin
-git pull origin main
-```
-
-���Զ�̷�֧���� `main`�����Ȳ鿴��
-
-```bash
-git branch -a
-```
-
-Ȼ��ʵ�ʷ�֧����ȡ��
-
-## 7. ��װ����
-
-����ĿĿ¼ִ�У�
-
-```bash
-cd /var/www/kemite-site
-npm install
-```
-
-���������������Ҳ����ʹ�ã�
-
-```bash
-npm install --omit=dev
-```
-
-��ǰ��Ŀ�������ֱ࣬�� `npm install` Ҳ���ԡ�
-
-## 8. ���û�������
-
-����ģ�壺
-
-```bash
-cp .env.example .env
-```
-
-�༭��
-
-```bash
-nano .env
-```
-
-�����������ù��� IP ����ʱ����������д��
-
-```env
-PORT=3001
-PUBLIC_ORIGIN=http://39.96.209.49
-
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=kemite_user
-DB_PASSWORD=replace_with_strong_password
-DB_NAME=solder_paste_site
-DB_CONNECTION_LIMIT=10
-
-JWT_SECRET=replace_with_a_long_random_secret
-JSON_LIMIT=12mb
-UPLOAD_LIMIT_MB=8
-BACKUP_RETENTION=50
-```
-
-�������� HTTPS �󣬸ĳɣ�
-
-```env
-PUBLIC_ORIGIN=https://www.example.com
-```
-
-����ǿ��� `JWT_SECRET`��
-
-```bash
-node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
-```
-
-��������� `.env` �� `JWT_SECRET`��
-
-## 9. ��ʼ�� MySQL
-
-��¼ MySQL��
+登录 MySQL：
 
 ```bash
 sudo mysql
 ```
 
-�������ݿ���û���
+创建数据库和应用用户。请使用自己的强密码，不要把真实密码写入文档或提交：
 
 ```sql
-CREATE DATABASE solder_paste_site CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'kemite_user'@'localhost' IDENTIFIED BY 'replace_with_strong_password';
-GRANT ALL PRIVILEGES ON solder_paste_site.* TO 'kemite_user'@'localhost';
+CREATE DATABASE kemite_site DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'kemite_app'@'localhost' IDENTIFIED BY '<strong-password>';
+GRANT ALL PRIVILEGES ON kemite_site.* TO 'kemite_app'@'localhost';
 FLUSH PRIVILEGES;
+```
+
+退出 MySQL：
+
+```sql
 EXIT;
 ```
 
-Ȼ��ִ����Ŀ��ʼ����
+## 4. `.env.production` 配置
+
+在服务器上创建 `.env.production`，只保存在线上服务器，不提交到 Git：
+
+```bash
+cp .env.example .env.production
+```
+
+需要配置的字段：
+
+```text
+NODE_ENV
+PORT
+JWT_SECRET
+CORS_ORIGINS
+ADMIN_USERNAME
+ADMIN_PASSWORD
+UPLOAD_LIMIT_MB
+JSON_LIMIT
+BACKUP_RETENTION
+CONTACT_RATE_LIMIT_WINDOW_MS
+CONTACT_RATE_LIMIT_MAX
+DB_HOST
+DB_PORT
+DB_USER
+DB_PASSWORD
+DB_NAME
+DB_CONNECTION_LIMIT
+```
+
+注意：
+
+- `JWT_SECRET` 必须使用强随机值。
+- `ADMIN_PASSWORD` 必须使用强密码。
+- `DB_PASSWORD` 使用数据库用户的真实密码，但不要写入仓库。
+- `CORS_ORIGINS` 填写生产域名。
+- `PORT` 建议使用 `3001`，由 Nginx 反向代理。
+
+## 5. 安装依赖与构建
+
+安装依赖：
+
+```bash
+npm install
+```
+
+构建静态资源和模型数据：
+
+```bash
+npm run build
+```
+
+## 6. 数据库初始化
+
+确认 `.env.production` 已配置数据库字段后执行：
 
 ```bash
 npm run db:init
 ```
 
-��ʼ���ᴴ����
+该命令会执行 `server/sql/init.sql`，创建项目所需的基础表结构。
 
-- ����Ա�û���
-- ��ϵ���Ա�
-- Ĭ�Ϲ���Ա�˺�
-
-�����޸�Ĭ�Ϲ���Ա�˺Ż����룬���飺
-
-```text
-server/sql/init.sql
-```
-
-## 10. �ļ�Ȩ��
-
-Node ������Ҫд������λ�ã�
-
-```text
-products.json
-public/products-data.js
-public/products/
-public/datasheets/
-backups/products/
-```
-
-����Ŀ¼��
+产品数据库化使用独立 SQL：
 
 ```bash
-mkdir -p public/products public/datasheets backups/products
+mysql -u <db-user> -p <db-name> < docs/sql/product-schema.sql
 ```
 
-����õ�ǰ��¼�û����� PM2��
+## 7. 产品 JSON 同步到 MySQL
+
+当前项目处于双写观察期：
+
+- 后台写入仍以 `products.json` 为主。
+- MySQL 在 JSON 写入成功后同步。
+- `/api/products` 优先读取 MySQL，失败时回退 JSON。
+
+先 dry-run：
 
 ```bash
-sudo chown -R $USER:$USER /var/www/kemite-site
+node tools/sync-products-json-to-db.js --env=.env.production
 ```
 
-����� `www-data` ���У�
+确认输出无误后执行：
 
 ```bash
-sudo chown -R www-data:www-data /var/www/kemite-site
+node tools/sync-products-json-to-db.js --execute --env=.env.production
 ```
 
-���鲻Ҫ��������Ŀ���� `777` Ȩ�ޡ�
-
-## 11. ��� Node ����
-
-���ֶ����ԣ�
+同步后对比：
 
 ```bash
-npm run server
+node tools/compare-products.js --env=.env.production
 ```
 
-�����������˵�������������
+期望结果中 `matched` 为 `true`，并且缺失、额外和字段差异为空。
 
-```text
-Kemite site server running on http://127.0.0.1:3001
-```
+## 8. PM2 启动
 
-���һ���ն˲��ԣ�
+启动生产服务：
 
 ```bash
-curl http://127.0.0.1:3001/api/health
+pm2 start "npm run start" --name kemite-site
 ```
 
-����Ӧ���أ�
-
-```json
-{"status":"ok"}
-```
-
-ȷ��������ʹ�� PM2 �ػ���
+保存 PM2 进程列表：
 
 ```bash
-pm2 start npm --name kemite-site -- run server
 pm2 save
+```
+
+设置开机自启：
+
+```bash
 pm2 startup
 ```
 
-PM2 �������
+查看日志：
 
 ```bash
-pm2 status
 pm2 logs kemite-site
-pm2 restart kemite-site
-pm2 stop kemite-site
-pm2 delete kemite-site
 ```
 
-## 12. ���� Nginx
+重启服务：
 
-����վ�����ã�
+```bash
+pm2 restart kemite-site
+```
+
+## 9. Nginx 反向代理
+
+创建站点配置：
 
 ```bash
 sudo nano /etc/nginx/sites-available/kemite-site
 ```
 
-��������ʹ�ù��� IP �����ã�
+示例配置：
 
 ```nginx
 server {
-  listen 80;
-  server_name _;
+    listen 80;
+    server_name example.com www.example.com;
 
-  client_max_body_size 12m;
+    client_max_body_size 20m;
 
-  location / {
-    proxy_pass http://127.0.0.1:3001;
-    proxy_http_version 1.1;
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto $scheme;
-  }
+    location / {
+        proxy_pass http://127.0.0.1:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
 }
 ```
 
-������ʱ��
-
-```nginx
-server {
-  listen 80;
-  server_name example.com www.example.com;
-
-  client_max_body_size 12m;
-
-  location / {
-    proxy_pass http://127.0.0.1:3001;
-    proxy_http_version 1.1;
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto $scheme;
-  }
-}
-```
-
-����վ�㣺
+启用站点：
 
 ```bash
 sudo ln -s /etc/nginx/sites-available/kemite-site /etc/nginx/sites-enabled/kemite-site
@@ -404,304 +258,74 @@ sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-���Ĭ��վ���ͻ�����Խ��ã�
+## 10. HTTPS
 
-```bash
-sudo rm -f /etc/nginx/sites-enabled/default
-sudo nginx -t
-sudo systemctl reload nginx
-```
-
-## 13. ���� HTTPS
-
-û������ʱ����ʱ��Ҫ���� HTTPS��
-
-���������������������󣬿���ʹ�� Certbot��
+安装 Certbot：
 
 ```bash
 sudo apt install -y certbot python3-certbot-nginx
+```
+
+申请证书：
+
+```bash
 sudo certbot --nginx -d example.com -d www.example.com
 ```
 
-֤�����ڲ��ԣ�
+检查自动续期：
 
 ```bash
 sudo certbot renew --dry-run
 ```
 
-HTTPS ��ú󣬼ǵð� `.env` �ĳɣ�
+## 11. 上线验收清单
 
-```env
-PUBLIC_ORIGIN=https://www.example.com
-```
+- 首页可以正常打开，无白屏。
+- 产品中心可正常加载、搜索和筛选。
+- 产品详情页图片、参数、PDF 链接正常。
+- 3D 展示资源加载成功。
+- 留言表单可提交，限流生效。
+- 后台登录、退出、刷新保持登录状态正常。
+- 后台产品新增、编辑、删除、排序正常。
+- 图片和 PDF 上传正常，刷新后仍可访问。
+- `/api/health` 返回正常。
+- `/api/products` 返回产品列表。
+- `/api/products-db` 可用于 MySQL 验证。
+- `tools/compare-products.js` 对比通过。
+- Nginx、PM2、MySQL 日志无明显错误。
+- HTTPS 证书有效，HTTP 可跳转到 HTTPS。
 
-Ȼ���������
+## 12. 回滚方式
 
-```bash
-pm2 restart kemite-site
-```
-
-## 14. �Ʒ�������ȫ��
-
-�����ơ���Ѷ�Ƶȷ�������Ҫ�ڰ�ȫ����У�
-
-- 80��HTTP
-- 443��HTTPS����������ʹ��
-- 22��SSH��������ʹ��
-
-Node �� `3001` �˿ڽ��鲻�Թ������ţ�ֻ������� Nginx ���ʡ�
-
-## 15. ��������
-
-��������ִ�У�
-
-```bash
-node tools/verify-site.mjs
-node --check server/src/index.js
-curl http://127.0.0.1:3001/api/health
-pm2 status
-sudo nginx -t
-```
-
-��������ʣ�
-
-```text
-http://����������IP/
-http://����������IP/products.html
-http://����������IP/contact.html
-http://����������IP/admin.html
-http://����������IP/api/health
-```
-
-�ص��飺
-
-- ��ҳ�ܴ�
-- ��Ʒ�����ܿ�����Ʒ��ͼƬ
-- ��Ʒ����ҳ�ܴ�
-- ���� PDF ������
-- ��ϵ������ύ
-- ��̨�ܵ�¼
-- ��̨�ܿ�������
-- ��̨�ܱ༭��Ʒ������
-- �ϴ���ƷͼƬ��ǰ̨����ʾ
-- `/api/health` ���� `{"status":"ok"}`
-
-## 16. �����������
-
-�Ժ�������ʱ���Ƽ����̣�
+回滚代码：
 
 ```bash
 cd /var/www/kemite-site
-pm2 stop kemite-site
-```
-
-�������ݣ�
-
-```bash
-sudo mkdir -p /var/backups/kemite-site
-sudo tar -czf /var/backups/kemite-site/kemite-data-$(date +%Y%m%d-%H%M%S).tar.gz \
-  .env \
-  products.json \
-  public/products \
-  public/datasheets \
-  public/products-data.js \
-  backups/products
-```
-
-���´��룺
-
-```bash
-git pull origin main
+git fetch --all
+git checkout <previous-commit-or-tag>
 npm install
-npm run db:init
-node tools/verify-site.mjs
-node --check server/src/index.js
+npm run build
 pm2 restart kemite-site
 ```
 
-����飺
+回滚产品数据：
 
-```bash
-pm2 logs kemite-site --lines 80
-curl http://127.0.0.1:3001/api/health
-```
+1. 恢复发布前备份的 `products.json`。
+2. 恢复 `public/products/` 和 `public/datasheets/`。
+3. 运行同步 dry-run。
+4. 确认无误后执行 JSON 到 MySQL 同步。
+5. 执行对比工具确认一致。
 
-## 17. ������ָ�
+如果 MySQL 临时不可用：
 
-### ���� MySQL
+- 保留 `products.json`。
+- 保留 `public/products-data.js`。
+- 暂停依赖 MySQL-only 的验证流程。
+- 修复数据库后重新运行同步和对比工具。
 
-```bash
-mysqldump -u kemite_user -p solder_paste_site > solder_paste_site-$(date +%Y%m%d).sql
-```
+## 13. 安全提醒
 
-### �ָ� MySQL
-
-```bash
-mysql -u kemite_user -p solder_paste_site < solder_paste_site-20260704.sql
-```
-
-### ���ݲ�Ʒ����
-
-```bash
-tar -czf kemite-files-$(date +%Y%m%d).tar.gz \
-  products.json \
-  public/products-data.js \
-  public/products \
-  public/datasheets \
-  backups/products
-```
-
-### �ָ���Ʒ����
-
-```bash
-tar -xzf kemite-files-20260704.tar.gz -C /var/www/kemite-site
-pm2 restart kemite-site
-```
-
-## 18. ��־�鿴
-
-PM2 ��־��
-
-```bash
-pm2 logs kemite-site
-pm2 logs kemite-site --lines 200
-```
-
-Nginx ��־��
-
-```bash
-sudo tail -f /var/log/nginx/access.log
-sudo tail -f /var/log/nginx/error.log
-```
-
-MySQL ״̬��
-
-```bash
-sudo systemctl status mysql
-```
-
-Nginx ״̬��
-
-```bash
-sudo systemctl status nginx
-```
-
-## 19. ���������Ų�
-
-### ���ʹ��� IP û��Ӧ
-
-��飺
-
-```bash
-sudo systemctl status nginx
-sudo nginx -t
-pm2 status
-curl http://127.0.0.1:3001/api/health
-```
-
-����ԭ��
-
-- �Ʒ�������ȫ��û�п��� 80
-- Nginx û���
-- Nginx ����û������
-- Node ����û���
-- PM2 �����쳣
-
-### Nginx ���� 502
-
-502 ͨ��˵�� Nginx �Ҳ�����˷���
-
-��飺
-
-```bash
-pm2 status
-pm2 logs kemite-site
-curl http://127.0.0.1:3001/api/health
-```
-
-����ԭ��
-
-- Node ����û�����
-- `.env` �˿ڲ��� `3001`
-- Nginx ����˿�д��
-- Node ���ʱ�����˳�
-
-### ��̨��¼ʧ��
-
-��飺
-
-```bash
-pm2 logs kemite-site
-sudo systemctl status mysql
-npm run db:init
-```
-
-����ԭ��
-
-- MySQL û���
-- `.env` ���ݿ��û������������
-- ���ݿ�û�г�ʼ��
-- ����Ա�˺����벻��ȷ
-- `JWT_SECRET` û������
-
-### ��Ʒ����ʧ��
-
-���Ȩ�ޣ�
-
-```bash
-ls -la products.json public/products-data.js public/products public/datasheets backups/products
-```
-
-����ԭ��
-
-- Node �����û�û��дȨ��
-- ��ƷͼƬ·������ `public/products/` ��ͷ
-- PDF ·������ `public/datasheets/` ��ͷ
-- ��Ʒ�ֶδ����������룬����̨�����߼�����
-
-### �ϴ�ͼƬʧ��
-
-��飺
-
-- �ļ���С�Ƿ񳬹� `UPLOAD_LIMIT_MB`
-- ͼƬ��ʽ�Ƿ�Ϊ PNG��JPG��JPEG��WebP
-- `public/products/` �Ƿ��д
-- Nginx �Ƿ������� `client_max_body_size 12m`
-
-### ��ϵ����ύʧ��
-
-��飺
-
-- `/api/contact` �Ƿ��ܷ���
-- MySQL �Ƿ�����
-- `contacts` ���Ƿ����
-- ���������̨�Ƿ��нӿڴ���
-
-### ��Ʒҳû������
-
-��飺
-
-```bash
-curl http://127.0.0.1:3001/api/products
-ls -la products.json public/products-data.js
-```
-
-����ԭ��
-
-- `products.json` ��ʽ����
-- Node ����û�ж�ȡ����Ŀ��Ŀ¼
-- `public/products-data.js` û��ͬ������
-- ��ƷͼƬ·������
-
-## 20. ����ά������
-
-- ��Ҫ�� `.env` �ϴ��������ֿ�
-- ��Ҫɾ�� `public/products/`��`public/datasheets/`��`backups/products/`
-- ÿ�θ���ǰ�ȱ��ݲ�Ʒ����
-- ���ڵ��� MySQL
-- ���ڼ�� PM2 ��־
-- ��ƷͼƬ����ͳһ�׵׺ͳߴ�
-- ��Ʒ���� PDF ��������ʹ��Ӣ�ġ����֡��̺���
-- ��̨�������ߺ�Ӧ��ʱ�޸�
-- û������ʱ���� HTTP �͹��� IP������������/������ɺ��ټ� HTTPS
-
+- 不要提交 `.env.production`。
+- 不要在文档、提交信息或截图里暴露真实密码、JWT 密钥或数据库连接信息。
+- 上传目录、资料目录和备份目录应排除在 Git 提交之外。
+- 发布前执行 `git status --short`，确认没有敏感文件被暂存。

@@ -1,393 +1,165 @@
-# ��������ҵ������Ŀ˵��
+# Kemite Website
 
-����Ŀ�����������غ��Ӳ������޹�˾����ҵ�������̨����ϵͳ���������ࡢ��Ƭ�콺�����Ӻ��Ӳ��ϵȲ�Ʒչʾ���������ء��ͻ������ռ�����Ӫά����
+Kemite Website 是一个面向焊接材料与电子制造场景的企业官网项目，包含前台展示、产品中心、产品详情、留言表单和后台管理能力。项目采用 Node.js/Express 统一提供静态页面和 API，产品数据处于 MySQL 优先读取、JSON 兜底、后台写入双写观察的迁移阶段。
 
-��Ŀ����ǰ���ͬԴ����ʽ����������ֻ����һ�� Node/Express ����ͬʱ�ṩ������̬ҳ��� `/api` �ӿڣ�Nginx ֻ����ѹ��� HTTP ���������� Node ����
+## 技术栈
 
-## 1. ��Ŀ��λ
+- 前端：HTML、CSS、原生 JavaScript
+- 3D 展示：React Three Fiber、Three.js、Vite、esbuild
+- 后端：Node.js、Express
+- 数据库：MySQL
+- 鉴权：JWT、bcrypt
+- 文件上传：multer
+- 部署：Nginx、PM2
+- 数据源：MySQL、`products.json`、`public/products-data.js`
 
-��վ��Ҫ�������
+## 功能模块
 
-- ����������ҵ�ɹ���Ա
-- SMT ���չ���ʦ
-- ����װ�䡢���ޡ����Ӳ���ѡ����Ա
-- ��ҵ�ڲ���Ӫ�Ͳ�Ʒά����Ա
+- 官网页面：首页、产品中心、产品详情、关于我们、联系我们
+- 产品展示：产品筛选、搜索、详情渲染、图片与 PDF 资料展示
+- 3D 展示：产品模型构建、模型数据嵌入和首页交互展示
+- 留言管理：前台留言提交、后台查看、标记已读、导出和删除
+- 后台管理：管理员登录、产品新增、编辑、删除、排序、图片/PDF 上传
+- 图片库：产品图片列表、使用状态判断、单个或批量删除
+- 产品数据库化：MySQL 表结构、JSON 到 MySQL 迁移、对比和同步工具
 
-��վ�ص�չʾ��
-
-- ������Ǧ����
-- ������Ǧ����
-- ��Ǧ����
-- PCB ��Ƭ�콺
-- ��ƷͼƬ���Ͻ���ϵ��Ӧ�ó��������� PDF
-- �ͻ��������̨����
-
-## 2. ����ջ
-
-- ǰ�ˣ�ԭ�� HTML��CSS��JavaScript
-- ��ˣ�Node.js��Express
-- ���ݿ⣺MySQL
-- ���̹����PM2
-- ��������Nginx
-- �����ļ���`products.json`��`public/products-data.js`
-- �ϴ�Ŀ¼��`public/products/`��`public/datasheets/`
-
-��Ŀû��ʹ�� React��Vue �򹹽����ߣ�ҳ�����ֱ���� Express ��̬�����ṩ��
-
-## 3. Ŀ¼�ṹ
+## 项目结构
 
 ```text
 .
-������ index.html                 # ������ҳ
-������ products.html              # ��Ʒ�����б�ҳ
-������ product.html               # ������Ʒ����ҳ
-������ about.html                 # ��ҵ��������������ҳ
-������ contact.html               # ��ϵ���������Ա��
-������ admin.html                 # ����Ա��̨ҳ��
-������ styles.css                 # ȫվ��ʽ
-������ products.json              # ��Ʒ������
-������ public/
-��   ������ products-data.js       # ǰ�˱��ò�Ʒ����
-��   ������ products/              # ��ƷͼƬ
-��   ������ datasheets/            # ��Ʒ���� PDF
-��   ������ images/brand/          # Ʒ�ơ���ҳͼƬ
-������ server/
-��   ������ src/index.js           # Express ������
-��   ������ src/db.js              # MySQL ����
-��   ������ src/run-sql.js         # ��ʼ�� SQL ִ�нű�
-��   ������ sql/init.sql           # ���ݿ��ṹ�͹���Ա��ʼ��
-������ tools/verify-site.mjs      # ��Ŀ�Լ�ű�
-������ backups/products/          # ��Ʒ�����Զ�����
-������ package.json
-������ .env.example
-������ DEPLOY.md                  # �ƶ˲���˵��
+├── index.html
+├── products.html
+├── product.html
+├── about.html
+├── contact.html
+├── admin.html
+├── styles/
+├── src/
+│   ├── admin/
+│   ├── components/
+│   └── utils/
+├── public/
+│   ├── images/
+│   ├── products-data.js
+│   ├── products/
+│   └── datasheets/
+├── products/
+│   └── models/
+├── server/
+│   ├── sql/init.sql
+│   └── src/
+│       ├── config/
+│       ├── controller/
+│       ├── middleware/
+│       ├── model/
+│       ├── routes/
+│       └── service/
+├── tools/
+├── docs/
+├── products.json
+├── package.json
+├── README.md
+└── DEPLOY.md
 ```
 
-## 4. ҳ��˵��
+## 本地运行
 
-| ҳ�� | �ļ� | ˵�� |
-| --- | --- | --- |
-| ��ҳ | `index.html` | ��ҵ��λ�����Ĳ�Ʒ������չʾ |
-| ��Ʒ���� | `products.html` | ��Ʒɸѡ������������Ԥ�� |
-| ��Ʒ���� | `product.html` | ������Ʒ���顢���������� |
-| ����/���� | `about.html` | ��ҵ���ܡ��������� |
-| ��ϵ���� | `contact.html` | ��ϵ��ʽ���ͻ����Ա�� |
-| �����̨ | `admin.html` | ���ԡ���Ʒ��ͼƬ���� |
-
-## 5. �������
-
-�Ƽ�ֱ��˫����
-
-```text
-start.bat
-```
-
-����������õ�ַ��
-
-- ǰ̨��վ��`http://127.0.0.1:8080`
-- ��̨ҳ�棺`http://127.0.0.1:3001/admin.html`
-- ��˽ӿڣ�`http://127.0.0.1:3001`
-- ������飺`http://127.0.0.1:3001/api/health`
-
-���ؿ���ʱ�����ʹ�� `8080` ��ǰ��ҳ�棬ҳ����Զ��ѽӿ�����ת�� `3001` ��˷���
-
-## 6. �������з�ʽ
-
-��������ֻ��Ҫ���� Node ����
+安装依赖：
 
 ```bash
 npm install
-npm run db:init
-npm run server
 ```
 
-Node �����ͬʱ�ṩ��
-
-- ���� HTML ҳ��
-- CSS��ͼƬ��PDF �Ⱦ�̬��Դ
-- `/api/products`
-- `/api/contact`
-- `/api/admin/*`
-
-����������Ҫ�ٵ������ `python -m http.server`�������������ǰ��ҳ��ͺ�˽ӿڲ���ͬһ����������ֽӿڵ�ַ���󡢺�̨��¼�쳣���ϴ�·����һ�µ����⡣
-
-## 7. ��������
-
-���ƻ�������ģ�壺
+构建前端模型与静态数据：
 
 ```bash
-cp .env.example .env
+npm run build
 ```
 
-�ؼ�����˵����
+启动开发环境服务：
 
-| ���� | ˵�� |
-| --- | --- |
-| `PORT` | Node ����˿ڣ�Ĭ�� `3001` |
-| `PUBLIC_ORIGIN` | վ�㹫�����ʵ�ַ������ `http://39.96.209.49` ����ʽ���� |
-| `DB_HOST` | MySQL ������ͨ���� `localhost` |
-| `DB_PORT` | MySQL �˿ڣ�Ĭ�� `3306` |
-| `DB_USER` | MySQL �û� |
-| `DB_PASSWORD` | MySQL ���� |
-| `DB_NAME` | ���ݿ����ƣ�Ĭ�Ͻ��� `solder_paste_site` |
-| `JWT_SECRET` | ��̨��¼������Կ��������������ʹ��ǿ���ֵ |
-| `JSON_LIMIT` | JSON �������С���� |
-| `UPLOAD_LIMIT_MB` | ͼƬ��PDF �ϴ���С���� |
-| `BACKUP_RETENTION` | ��Ʒ�����Զ����ݱ������� |
+```bash
+npm run serve
+```
 
-## 8. ��̨����
-
-��̨��ڣ�
+默认访问地址：
 
 ```text
+http://127.0.0.1:3001
 http://127.0.0.1:3001/admin.html
 ```
 
-���𵽷�������
-
-```text
-http://����������IP/admin.html
-```
-
-��̨��Ҫģ�飺
-
-- ���Թ���
-- ��Ʒ����
-- ͼƬ��
-
-### ���Թ���
-
-�ͻ��� `contact.html` �ύ���Ժ󣬻�д�� MySQL �� `contacts` ���
-
-��̨֧�֣�
-
-- �鿴����
-- ���Ѷ���δ��ɸѡ
-- �����������绰�����䡢��������
-- ����Ѷ�
-- ɾ������
-- ���� Excel
-
-### ��Ʒ����
-
-��Ʒ�������ļ��ǣ�
-
-```text
-products.json
-```
-
-��̨�����Ʒ�󣬻�ͬ�����ɣ�
-
-```text
-public/products-data.js
-```
-
-�������ĺô��ǣ�
-
-- �ӿ�����ʱ��ǰ�����ȶ�ȡ `/api/products`
-- �ӿ��쳣ʱ��ǰ���Կ���ʹ�� `public/products-data.js` ��Ϊ��������
-- ��Ʒҳ�治����Ϊ���ݽӿ��쳣��ȫ�հ�
-
-��̨֧�֣�
-
-- ������Ʒ
-- �༭��Ʒ���ơ����ࡢӦ�ó������Ͻ���ϵ
-- �༭��Ʒ��顢���顢����
-- �ϴ���ƷͼƬ
-- �ϴ���Ʒ���� PDF
-- ɾ����Ʒ
-- ���ơ����Ʋ�Ʒչʾ˳��
-- ����ǰ���������������
-
-### ͼƬ��
-
-ͼƬ��ɨ�裺
-
-```text
-public/products/
-```
-
-��̨֧�֣�
-
-- �鿴���ϴ���ƷͼƬ
-- �ж�ͼƬ�Ƿ񱻲�Ʒ����
-- ɾ��δ�����õ�ͼƬ
-
-����Ʒ����ʹ�õ�ͼƬ����ֱ��ɾ��������ǰ̨��Ʒͼ��ɿ�ͼ��
-
-## 9. ��Ʒ���ݸ�ʽ
-
-`products.json` ��һ�����飬ÿ����Ʒ���½ṹ���£�
-
-```json
-{
-  "id": "KMT-001",
-  "name": "NC-5280RL1 ������Ǧ����",
-  "category": ["medium", "leadfree"],
-  "application": "����ģ��",
-  "alloy": "Sn64Bi35Ag1",
-  "image": "public/products/nc5280rl1-jar.png",
-  "keywords": "���� ��Ǧ ���� SMT",
-  "summary": "��Ʒ���˵��",
-  "detail": "��Ʒ��ϸ����",
-  "meta": [
-    ["�Ͻ���ϵ", "Sn64/Bi35/Ag1.0"],
-    ["����Ӧ��", "ģ����Ƭ����������"]
-  ],
-  "datasheet": "public/datasheets/example.pdf"
-}
-```
-
-ע�����
-
-- `id` Ӧ����Ψһ
-- `image` ������ `public/products/` ��ͷ
-- `datasheet` �����д�������� `public/datasheets/` ��ͷ
-- `category` �����飬������ͨ�ַ���
-- `meta` �Ƕ�ά���飬�ʺ�չʾ������
-
-## 10. ǰ��˽ӿڹ�ϵ
-
-ǰ̨ҳ�桢��̨ҳ��ͽӿڶ���ͬһ�� Express �����ṩ��
-
-���ù����ӿڣ�
-
-| �ӿ� | ���� | ˵�� |
-| --- | --- | --- |
-| `/api/health` | GET | ������� |
-| `/api/products` | GET | ��ȡ��Ʒ�б� |
-| `/api/datasheets` | GET | ��ȡ�����б� |
-| `/api/contact` | POST | �ύ�ͻ����� |
-
-��̨�ӿ���Ҫ��¼���ƣ�
-
-| �ӿ� | ���� | ˵�� |
-| --- | --- | --- |
-| `/api/admin/login` | POST | ����Ա��¼ |
-| `/api/admin/contacts` | GET | ��ȡ���� |
-| `/api/admin/contacts/export` | GET | �������� |
-| `/api/admin/contacts/:id/read` | PATCH | ��������Ѷ� |
-| `/api/admin/contacts/:id` | DELETE | ɾ������ |
-| `/api/admin/products` | GET | ��ȡ��̨��Ʒ�б� |
-| `/api/admin/products` | POST | ����Ĭ�ϲ�Ʒ |
-| `/api/admin/products/:id` | PUT | �����Ʒ |
-| `/api/admin/products/:id` | DELETE | ɾ����Ʒ |
-| `/api/admin/products/:id/move` | POST | ������Ʒ˳�� |
-| `/api/admin/uploads/product-image` | POST | �ϴ���ƷͼƬ |
-| `/api/admin/uploads/datasheet` | POST | �ϴ� PDF ���� |
-| `/api/admin/images` | GET | ��ȡͼƬ�� |
-| `/api/admin/images` | DELETE | ɾ��δ����ͼƬ |
-
-## 11. ���ݿ�
-
-MySQL ���ڱ��棺
-
-- ����Ա�˺�
-- ��ϵ�������
-
-��Ʒ��ϢĿǰ�� JSON �ļ�Ϊ������д�� MySQL������������Ӫ��Աά����Ʒ���ϣ�Ҳ����汾���ݡ�
-
-��ʼ�����ݿ⣺
+初始化数据库：
 
 ```bash
 npm run db:init
 ```
 
-��ʼ���ű�λ�ã�
-
-```text
-server/sql/init.sql
-```
-
-## 12. ���ݻ���
-
-��̨ÿ�θĶ���Ʒ����ǰ�����Զ����ݣ�
-
-- `products.json`
-- `public/products-data.js`
-
-����Ŀ¼��
-
-```text
-backups/products/
-```
-
-������������ⶨ�ڱ��ݣ�
-
-- MySQL ���ݿ�
-- `products.json`
-- `public/products/`
-- `public/datasheets/`
-- `backups/products/`
-- `.env`
-
-## 13. ����ǰ���
-
-ÿ�β�����ĺ󣬽���ִ�У�
+产品 JSON 到 MySQL 同步和对比：
 
 ```bash
-node tools/verify-site.mjs
-node --check server/src/index.js
+node tools/sync-products-json-to-db.js
+node tools/sync-products-json-to-db.js --execute
+node tools/compare-products.js --env=.env.development
 ```
 
-���㣺
+## 环境变量说明
 
-- ��ҳ�ܴ�
-- ��Ʒ��������ʾ��Ʒ
-- ��ƷͼƬ·����Ч
-- ���� PDF ·����Ч
-- ��ϵ������ύ
-- ��̨�ܵ�¼
-- ��̨��Ʒ�����ǰ̨��ͬ��
-- `/api/health` ���� `{"status":"ok"}`
+只在本地或服务器环境文件中配置真实值，不要提交真实配置。
 
-## 14. ��������
+| 字段名 | 用途 |
+| --- | --- |
+| `NODE_ENV` | 运行环境 |
+| `PORT` | Express 服务端口 |
+| `JWT_SECRET` | 后台登录 JWT 签名密钥 |
+| `CORS_ORIGINS` | 生产环境允许的跨域来源 |
+| `ADMIN_USERNAME` | 后台管理员用户名 |
+| `ADMIN_PASSWORD` | 后台管理员密码 |
+| `UPLOAD_LIMIT_MB` | 上传文件大小限制 |
+| `JSON_LIMIT` | JSON 请求体大小限制 |
+| `BACKUP_RETENTION` | 本地备份保留数量 |
+| `CONTACT_RATE_LIMIT_WINDOW_MS` | 留言限流时间窗口 |
+| `CONTACT_RATE_LIMIT_MAX` | 留言限流次数 |
+| `DB_HOST` | MySQL 主机 |
+| `DB_PORT` | MySQL 端口 |
+| `DB_USER` | MySQL 用户 |
+| `DB_PASSWORD` | MySQL 密码 |
+| `DB_NAME` | MySQL 数据库名 |
+| `DB_CONNECTION_LIMIT` | MySQL 连接池大小 |
 
-### ǰ̨�ܴ򿪣���Ʒ����ʾ
+## 构建命令
 
-���ȼ�飺
+```bash
+npm run build
+```
 
-- `products.json` �Ƿ����
-- `public/products-data.js` �Ƿ����
-- `/api/products` �Ƿ񷵻����� JSON
-- ��ƷͼƬ·���Ƿ��� `public/products/` ��ͷ
+该命令会执行：
 
-### ��̨��¼ʧ��
+- `tools/build-r3f-bundle.js`
+- `tools/embed-model-data.js`
 
-���ȼ�飺
+可选模型优化：
 
-- MySQL �Ƿ����
-- `.env` ���ݿ������Ƿ���ȷ
-- �Ƿ�ִ�й� `npm run db:init`
-- `JWT_SECRET` �Ƿ�����
+```bash
+npm run models:optimize
+```
 
-### ��̨�ϴ�ʧ��
+## 部署说明
 
-���ȼ�飺
-
-- `public/products/` �Ƿ��д
-- `public/datasheets/` �Ƿ��д
-- �ϴ��ļ��Ƿ񳬹� `UPLOAD_LIMIT_MB`
-- ͼƬ��ʽ�Ƿ�Ϊ PNG��JPG��JPEG��WebP
-- PDF �Ƿ�Ϊ `application/pdf`
-
-### ���������ӿڵ�ַ����
-
-��������Ӧͨ��ͬһ�� Node �����ṩҳ��ͽӿڣ�Nginx �������
+生产部署请查看 [DEPLOY.md](./DEPLOY.md)。推荐架构为：
 
 ```text
-127.0.0.1:3001
+Nginx :80/:443
+  -> 127.0.0.1:3001
+  -> Node.js / Express
+  -> MySQL
 ```
 
-��Ҫ��ǰ�˾�̬����ͺ�� API �ֿ����𵽲�ͬ�˿ڡ�
+## 安全提醒
 
-## 15. ά������
-
-- ��ƷͼƬ���ְ׵ס��ߴ�ͳһ���ʺ���ҵ����չʾ
-- ��Ʒ�����������ͺš��¶����͡��Ƿ���Ǧ
-- `summary` д���ɹ��������˵����;
-- `detail` д������ʦ�������乤�ա�Ӧ�á����潨��
-- ÿ�������Ĳ�Ʒǰ�ȱ��� `products.json`
-- ����������Ҫ�� `.env` �ύ�� GitHub
-- �޸ĺ�̨���ܺ����ٲ���һ�ε�¼�������Ʒ���ύ����
-
+- 不要提交 `.env.production`、`.env.development`、`.env.test` 或任何真实 `.env` 文件。
+- 不要把数据库密码、后台密码、JWT 密钥写入文档、代码注释或提交记录。
+- 生产环境必须使用强随机 `JWT_SECRET`。
+- 生产环境必须配置 `CORS_ORIGINS`。
+- 上传目录和备份目录应保持在 `.gitignore` 中。
+- GitHub 上传前执行 `git status --short` 和敏感文件检查。
