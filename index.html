@@ -673,7 +673,11 @@
           document.body.appendChild(script)
         })
 
-        loadScript('dist/model-data.js')
+        const modelDataReady = window.location.protocol === 'file:'
+          ? loadScript('dist/model-data.js')
+          : Promise.resolve()
+
+        modelDataReady
           .then(() => import('./dist/r3f/app.js'))
           .catch((error) => {
             console.error('3D 展示加载失败', error)

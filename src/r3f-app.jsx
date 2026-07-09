@@ -295,15 +295,16 @@ function ProductRing({ activeIndex, setActive, setLoaded, isPaused, setPaused })
   return (
     <group ref={ring}>
       {products.map((product, index) => (
-        <ProductModel
-          key={product.model}
-          product={product}
-          index={index}
-          activeIndex={activeIndex}
-          onReady={() => markReady(index)}
-          onSelect={setActive}
-          onHoverChange={setPaused}
-        />
+        <Suspense key={product.model} fallback={null}>
+          <ProductModel
+            product={product}
+            index={index}
+            activeIndex={activeIndex}
+            onReady={() => markReady(index)}
+            onSelect={setActive}
+            onHoverChange={setPaused}
+          />
+        </Suspense>
       ))}
     </group>
   );
@@ -320,9 +321,7 @@ function Scene({ activeIndex, setActive, setLoaded, isPaused, setPaused }) {
         <circleGeometry args={[4.0, 112]} />
         <meshBasicMaterial color="#dfe8eb" transparent opacity={0.32} side={THREE.DoubleSide} depthWrite={false} depthTest={false} />
       </mesh>
-      <Suspense fallback={null}>
-        <ProductRing activeIndex={activeIndex} setActive={setActive} setLoaded={setLoaded} isPaused={isPaused} setPaused={setPaused} />
-      </Suspense>
+      <ProductRing activeIndex={activeIndex} setActive={setActive} setLoaded={setLoaded} isPaused={isPaused} setPaused={setPaused} />
     </>
   );
 }
